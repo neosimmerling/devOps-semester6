@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Einkaufsliste</title>
+    <link rel="stylesheet" href="static/styles.css">
+</head>
+<body>
+    
+<header>
+    <span>🛒</span>
+    <h1>Einkaufsliste</h1>
+</header>
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <input type="text" id="new-list-input" placeholder="Neue Liste..."/>
+            <button class="btn btn-primary" onclick="createList()">+</button>
+        </div>
+        <div class="lists-container" id="lists-container">
+            <div class="empty-state">
+                <p>Keine Listen vorhanden</p>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main" id="main-panel">
+        <div class="empty-state" style="margin:auto;">
+            <div class="icon">👈</div>
+            <p>Wähle eine Liste aus oder erstelle eine neue.</p>
+        </div>
+    </main>
+    
+</div>
+
+<script src="static/app.js"></script>
+
+</body>
+</html>
