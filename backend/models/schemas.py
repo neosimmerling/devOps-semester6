@@ -19,8 +19,7 @@ class ItemUpdate(BaseModel):
 class ItemResponse(ItemBase):
     id: int
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attribute": True}
 
 class ListBase(BaseModel):
     name: str
@@ -35,5 +34,4 @@ class ListResponse(ListBase):
     id: int
     items: list[ItemResponse] = []
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attribute": True}
