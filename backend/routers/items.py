@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from backend.database import get_db
 from backend.models.models import ShoppingItem, ShoppingList
-from backend.models.schemas import ItemCreate, ItemResponse
+from backend.models.schemas import ItemCreate, ItemUpdate, ItemResponse
 
 router = APIRouter(prefix="/items", tags=["items"])
 
@@ -24,6 +24,18 @@ def create_item(data: ItemCreate, db: Session = Depends(get_db)):
     
     item = ShoppingItem(**data.model_dump())
     db.add(item)
+    db.commit()
+    db.refresh(item)
+    return item
+
+### PUT ###
+@router.put("/{item_id}", response_model=ItemResponse)
+def update_item(item_id: int, data: ItemUpdate, db: Session = Depends(get_db)):
+    item = db.query(ShoppingItem).filter(ShoppingItem.id == item_id).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Artikel nicht gefunden")
+    for field, value in data.model_dump(exclude_unset=True).items():
+        setattr(item, field, value)
     db.commit()
     db.refresh(item)
     return item

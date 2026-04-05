@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from backend.database import get_db
 from backend.models.models import ShoppingList
-from backend.models.schemas import ListCreate, ListResponse
+from backend.models.schemas import ListCreate, ListUpdate, ListResponse
 
 router = APIRouter(prefix="/lists", tags=["lists"])
 
@@ -36,3 +36,15 @@ def delete_list(list_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Liste nicht gefunden")
     db.delete(lst)
     db.commit()
+
+### PUT ###
+@router.put("/{list_id}", response_model=ListResponse)
+def update_list(list_id: int, data: ListUpdate, db: Session = Depends(get_db)):
+    lst = db.query(ShoppingList).filter(ShoppingList.id == list_id).first()
+    if not lst:
+        raise HTTPException(status_code=404, detail="Liste nicht gefunden")
+    if data.name is not None:
+        lst.name = data.name
+    db.commit()
+    db.refresh(lst)
+    return lst
