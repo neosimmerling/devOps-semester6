@@ -52,7 +52,7 @@ Die App ist erreichbar unter: http://127.0.0.1:8000
 
 ### 1. Build + Start
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 ### 2. Zugriff
@@ -60,14 +60,14 @@ Die App ist erreichbar unter: http://127.0.0.1:8000
 
 ### 3. Stoppen
 ```bash
-docker-compose down
+docker compose down
 ```
 
 ---
 
 ## c) Tests
 ```bash
-pytest backend\tests
+python -m pytest backend\tests -v
 ```
 
 ---
@@ -77,6 +77,13 @@ Die CI-Pipeline befindet sich in:
 ```bash
 .github/workflows/ci.yml
 ```
+
+---
+
+## e) API-Dokumentation
+FastAPI generiert automatisch eine interaktive API-Dokumentation:
+- Swagger UI: http://127.0.0.1:8000/docs
+- ReDoc: http://127.0.0.1:8000/redoc
 
 ---
 
