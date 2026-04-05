@@ -4,5 +4,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./data:/app/data
+      - ./db:/app/db
+    environment:
+      - DATABASE_URL=sqlite:///./db/einkaufsliste.db
   
