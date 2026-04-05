@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from backend.database import engine, Base
 from contextlib import asynccontextmanager
 from backend.routers import lists, items
@@ -12,6 +13,4 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(lists.router, prefix="/api")
 app.include_router(items.router, prefix="/api")
 
-@app.get("/")
-def root():
-    return {"message": "API läuft!"}
+app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
