@@ -42,9 +42,9 @@ pip install -r requirements.txt
 
 ### 4. Backend starten
 ```bash
-uvicorn backend.main:app --reload
-http://localhost:8000
+python -m uvicorn backend.main:app --reload
 ```
+Die App ist erreichbar unter: http://127.0.0.1:8000
 
 ---
 
@@ -56,9 +56,7 @@ docker-compose up --build
 ```
 
 ### 2. Zugriff
-```bash
-http://localhost:8000
-```
+Die App ist erreichbar unter: http://127.0.0.1:8000
 
 ### 3. Stoppen
 ```bash
