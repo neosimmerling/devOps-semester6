@@ -15,7 +15,7 @@ Die Anwendung stellt eine API zur Verwaltung von Listen und Items bereit und bie
 
 ## Technische Voraussetzungen
 - Python 3.10+
-- Docker & Docker Composer
+- Docker & Docker Compose
 - Git
 
 ---
@@ -32,7 +32,7 @@ cd devOps-semester6
 ```bash
 python -m venv venv
 venv\Scripts\activate       # Windows
-source venv/bon/activate    # Linux / Mac
+source venv/bin/activate    # Linux / Mac
 ```
 
 ### 3. Abhängigkeiten installieren
