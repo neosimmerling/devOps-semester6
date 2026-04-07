@@ -60,7 +60,16 @@ function renderMain(lst) {
     <div class="add-item-bar">
       <input type="text" id="item-name" placeholder="Artikel hinzufügen…" onkeydown="if(event.key==='Enter') addItem()" />
       <input type="number" id="item-qty" class="qty-input" placeholder="Anz." value="1" min="1" />
-      <input type="text" id="item-unit" class="unit-input" placeholder="Einheit" value="Stück" />
+      <select id="item-unit" class="unit-input">
+        <option value="Stück">Stück</option>
+        <option value="kg">kg</option>
+        <option value="g">g</option>
+        <option value="l">l</option>
+        <option value="ml">ml</option>
+        <option value="Packung">Packung</option>
+        <option value="Flasche">Flasche</option>
+        <option value="Dose">Dose</option>
+      </select>
       <button class="btn btn-primary" onclick="addItem()">Hinzufügen</button>
     </div>
     <div class="items-container" id="items-container">
@@ -104,7 +113,7 @@ async function deleteList(id) {
 async function addItem() {
   const name = document.getElementById('item-name').value.trim();
   const quantity = parseInt(document.getElementById('item-qty').value) || 1;
-  const unit = document.getElementById('item-unit').value.trim() || 'Stück';
+  const unit = document.getElementById('item-unit').value;
   if (!name) return;
   await apiFetch(`/items/`, {method: 'POST', body: JSON.stringify({ list_id: activeListId, name, quantity, unit }) });
   document.getElementById('item-name').value = '';
@@ -129,7 +138,16 @@ function startEditItem(id) {
     <div class="item-edit-form">
       <input id="edit-name-${id}" value="${esc(item.name)}" style="flex:1" />
       <input id="edit-qty-${id}" type="number" value="${item.quantity}" style="width:60px" />
-      <input id="edit-unit-${id}" value="${esc(item.unit)}" style="width:80px" />
+      <select id="edit-unit-${id}" style="width:90px">
+        <option value="Stück" ${item.unit === 'Stück' ? 'selected': ''}>Stück</option>
+        <option value="kg" ${item.unit === 'kg' ? 'selected': ''}>kg</option>
+        <option value="g" ${item.unit === 'g' ? 'selected': ''}>g</option>
+        <option value="l" ${item.unit === 'l' ? 'selected': ''}>l</option>
+        <option value="ml" ${item.unit === 'ml' ? 'selected': ''}>ml</option>
+        <option value="Packung" ${item.unit === 'Packung' ? 'selected': ''}>Packung</option>
+        <option value="Flasche" ${item.unit === 'Flasche' ? 'selected': ''}>Flasche</option>
+        <option value="Dose" ${item.unit === 'Dose' ? 'selected': ''}>Dose</option>
+      </select>
       <button class="btn btn-primary" onclick="saveEditItem(${id})">Speichern</button>
       <button class="btn btn-icon" onclick="renderMain(lists.find(l=>l.id===activeListId))">✕</button>
     </div>`;
