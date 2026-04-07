@@ -351,6 +351,17 @@ footer {
     border-radius: 20px;
 }
 
+.sort-select {
+    padding: 4px 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 13px;
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+    outline: none;
+}
+
 @media (max-width: 700px) {
     .layout {
         grid-template-columns: 1fr;

@@ -55,6 +55,12 @@ function renderMain(lst) {
     <div class="main-header">
       <h2 id="list-title">${esc(lst.name)}</h2>
       <span class="badge">${pct}%</span>
+      <select id="sort-select" class="sort-select" onchange="applySorting()">
+        <option value="default">Reihenfolge</option>
+        <option value="name">Name A-Z</option>
+        <option value="name-desc">Name Z-A</option>
+        <option value="checked">Erledigt zuletzt</option>
+      </select>
     </div>
     <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
     <div class="add-item-bar">
@@ -188,6 +194,23 @@ async function deleteCheckedItems() {
   if (!confirm(`${checkedItems.length} erledigte Artikel löschen?`)) return;
   await Promise.all(checkedItems.map(i => apiFetch(`/items/${i.id}`, {method: 'DELETE' })));
   await refreshActive();
+}
+
+function applySorting() {
+  const lst = lists.find(l => l.id === activeListId);
+  if (!lst) return;
+  const sort = document.getElementById('sort-select').value;
+  let items = [...lst.items];
+
+  if (sort === 'name') {
+    items.sort((a,b) => a.name.localeCompare(b.name));
+  } else if (sort === 'name-desc') {
+    items.sort((a,b) => a.name.localeCompare(a.name));
+  } else if (sort === 'checked') {
+    items.sort((a, b) => a.is_checked - b.is_checked);
+  }
+
+  document.getElementById('items-container').innerHTML = renderItems(items);
 }
 
 loadLists();
