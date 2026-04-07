@@ -71,6 +71,7 @@ function renderMain(lst) {
         <option value="Dose">Dose</option>
       </select>
       <button class="btn btn-primary" onclick="addItem()">Hinzufügen</button>
+      <button class="btn btn-secondary" onclick="deleteCheckedItems()" title="Erledigte löschen">Erledigt</button>
     </div>
     <div class="items-container" id="items-container">
       ${renderItems(lst.items)}
@@ -179,5 +180,14 @@ function esc(str) {
 document.getElementById('new-list-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') createList();
 });
+
+async function deleteCheckedItems() {
+  const lst = lists.find(l => l.id === activeListId);
+  const checkedItems = lst.items.filter(i => i.is_checked);
+  if (!checkedItems.length) return;
+  if (!confirm(`${checkedItems.length} erledigte Artikel löschen?`)) return;
+  await Promise.all(checkedItems.map(i => apiFetch(`/items/${i.id}`, {method: 'DELETE' })));
+  await refreshActive();
+}
 
 loadLists();

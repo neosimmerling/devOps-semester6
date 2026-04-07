@@ -162,6 +162,16 @@ footer {
     background: var(--accent-hover);
 }
 
+.btn-secondary {
+    background: var(--border);
+    color: var(--muted);
+}
+
+.btn-secondary:hover {
+    background: var(--danger-light);
+    color: var(--danger);
+}
+
 .btn-danger {
     background: transparent;
     color: var(--danger);
