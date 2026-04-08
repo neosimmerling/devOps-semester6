@@ -55,6 +55,7 @@ function renderMain(lst) {
     <div class="main-header">
       <h2 id="list-title">${esc(lst.name)}</h2>
       <span class="badge">${pct}%</span>
+      <button class="btn btn-icon" onclick="exportCSV()" title="als CSV exportieren">CSV</button>
       <select id="sort-select" class="sort-select" onchange="applySorting()">
         <option value="default">Reihenfolge</option>
         <option value="name">Name A-Z</option>
@@ -223,6 +224,21 @@ function toggleDarkMode() {
 if (localStorage.getItem('darkMode') === 'true') {
   document.body.classList.add('dark');
   document.getElementById('dark-toggle').textContent = '☀️';
+}
+
+function exportCSV() {
+  const lst = lists.find(l => l.id === activeListId);
+  if (!lst) return;
+  const rows = [['Artikel', 'Menge', 'Einheit', 'Erledigt']];
+  lst.items.forEach(i => rows.push([i.name, i.quantity, i.unit, i.is_checked ? 'Ja' : 'Nein']));
+  const csv = rows.map(r => r.join(';')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv; charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${lst.name}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 loadLists();
