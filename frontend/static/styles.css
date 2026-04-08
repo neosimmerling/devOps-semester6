@@ -26,6 +26,16 @@ body {
     min-height: 100vh;
 }
 
+body.dark {
+    --bg: #1a1a18;
+    --surface: #242422;
+    --border: #3a3a36;
+    --text: #e8e6de;
+    --muted: #9a9890;
+    --accent-light: #1e3320;
+    --shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
 header {
     background: var(--surface);
     border-bottom: 1px solid var(--border);
