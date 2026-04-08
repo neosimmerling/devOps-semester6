@@ -36,6 +36,23 @@ body.dark {
     --shadow: 0 1px 4px rgba(0,0,0,0.3);
 }
 
+body.dark input,
+body.dark select {
+    background: var(--surface);
+    color: var(--text);
+    border-color: var(--border);
+}
+
+body.dark input::placeholder {
+    color: var(--muted);
+}
+
+body.dark select:focus {
+    border-color: var(--accent);
+    outline: none;
+    transition: border-color 0.15s;
+}
+
 header {
     background: var(--surface);
     border-bottom: 1px solid var(--border);
