@@ -97,7 +97,7 @@ function renderItems(items) {
         onchange="toggleItem(${item.id}, this.checked)" />
       <span class="item-name">${esc(item.name)}</span>
       <span class="item-qty">${item.quantity} ${esc(item.unit)}</span>
-      ${!item.is_checked ? `<button class="btn btn-icon" onclick="startEditItem(${item.id})" title="Bearbeiten">✏️</button>` : `<span style="width:32px></span>`};
+      ${!item.is_checked ? `<button class="btn btn-icon" onclick="startEditItem(${item.id})" title="Bearbeiten">✏️</button>` : `<span style="width:32px"></span>`}
       <button class="btn btn-danger" onclick="deleteItem(${item.id})" title="Löschen">✕</button>
     </div>`).join('');
 }
@@ -218,7 +218,7 @@ function applySorting() {
   } else if(sort === 'qty-desc') {
     items.sort((a, b) => b.quantity - a.quantity);
   } else if(sort === 'unit') {
-    items.sort((a, b) ==> a.unit.localeCompare(b.unit));
+    items.sort((a, b) => a.unit.localeCompare(b.unit));
   }
 
   document.getElementById('items-container').innerHTML = renderItems(items);
@@ -253,7 +253,7 @@ function exportCSV() {
 
 function startEditList(id) {
   const lst = lists.find(l => l.id === id);
-  const item = document.querySelector(`.list-item[onclick="selectList(${id})"] .list-name`);
+  const item = document.querySelector(`.list-item[onclick="selectList(${id})"] .list-item-name`);
   const parent = item.closest(`.list-item-info`);
   parent.innerHTML =  `
     <input id="edit-list-${id}" value="${esc(lst.name)}" style="width:100%;padding:4px 8px;font-size:14px;border:1px solid var(--accent);border-radius:6px;outline:none;background:var(--bg);color:var(--text);"
