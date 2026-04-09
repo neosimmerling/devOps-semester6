@@ -94,7 +94,7 @@ function renderItems(items) {
         onchange="toggleItem(${item.id}, this.checked)" />
       <span class="item-name">${esc(item.name)}</span>
       <span class="item-qty">${item.quantity} ${esc(item.unit)}</span>
-      <button class="btn btn-icon" onclick="startEditItem(${item.id})" title="Bearbeiten">✏️</button>
+      ${!item.is_checked ? `<button class="btn btn-icon" onclick="startEditItem(${item.id})" title="Bearbeiten">✏️</button>` : `<span style="width:32px></span>`};
       <button class="btn btn-danger" onclick="deleteItem(${item.id})" title="Löschen">✕</button>
     </div>`).join('');
 }
