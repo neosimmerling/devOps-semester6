@@ -210,7 +210,7 @@ function applySorting() {
   if (sort === 'name') {
     items.sort((a,b) => a.name.localeCompare(b.name));
   } else if (sort === 'name-desc') {
-    items.sort((a,b) => a.name.localeCompare(a.name));
+    items.sort((a,b) => b.name.localeCompare(a.name));
   } else if (sort === 'checked') {
     items.sort((a, b) => a.is_checked - b.is_checked);
   } else if(sort === 'qty-asc') {
