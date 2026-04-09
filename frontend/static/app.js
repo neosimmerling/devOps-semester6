@@ -61,6 +61,9 @@ function renderMain(lst) {
         <option value="default">Reihenfolge</option>
         <option value="name">Name A-Z</option>
         <option value="name-desc">Name Z-A</option>
+        <option value="qty-asc">Menge aufsteigend</option>
+        <option value="qty-desc">Menge absteigend</option>
+        <option value="unit">Einheit A-Z</option>
         <option value="checked">Erledigt zuletzt</option>
       </select>
     </div>
@@ -210,6 +213,12 @@ function applySorting() {
     items.sort((a,b) => a.name.localeCompare(a.name));
   } else if (sort === 'checked') {
     items.sort((a, b) => a.is_checked - b.is_checked);
+  } else if(sort === 'qty-asc') {
+    items.sort((a, b) => a.quantity - b.quantity);
+  } else if(sort === 'qty-desc') {
+    items.sort((a, b) => b.quantity - a.quantity);
+  } else if(sort === 'unit') {
+    items.sort((a, b) ==> a.unit.localeCompare(b.unit));
   }
 
   document.getElementById('items-container').innerHTML = renderItems(items);
