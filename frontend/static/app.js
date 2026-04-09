@@ -33,6 +33,7 @@ function renderLists() {
         <div class="list-item-name">${esc(l.name)}</div>
         <div class="list-item-count">${done}/${total} erledigt</div>
       </div>
+      <button class="btn btn-icon" onclick="event.stopPropagation(); startEditList(${l.id})" title="Umbenennen">✏️</button>
       <button class="btn btn-danger" onclick="event.stopPropagation(); deleteList(${l.id})" title="Löschen">✕</button>
     </div>`;
   }).join('');
@@ -239,6 +240,27 @@ function exportCSV() {
   a.download = `${lst.name}.csv`;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+function startEditList(id) {
+  const lst = lists.find(l => l.id === id);
+  const item = document.querySelector(`.list-item[onclick="selectList(${id})"] .list-name`);
+  const parent = item.closest(`.list-item-info`);
+  parent.innerHTML =  `
+    <input id="edit-list-${id}" value="${esc(lst.name)}" style="width:100%;padding:4px 8px;font-size:14px;border:1px solid var(--accent);border-radius:6px;outline:none;background:var(--bg);color:var(--text);"
+      onkeydown="if(event.key==='Enter') saveEditList(${id}); if(event.key==='Escape') renderLists();" />`;
+  const input = document.getElementById(`edit-list-${id}`);
+  input.focus();
+  input.select();
+}
+
+async function saveEditList(id) {
+  const name = document.getElementById(`edit-list-${id}`).value.trim();
+  if (!name) return;
+  await apiFetch(`/lists/${id}`, { method: 'PUT', body: JSON.stringify({ name }) });
+  await loadLists();
+  const lst = lists.find(l => l.id === activeListId);
+  if (lst) renderMain(lst);
 }
 
 loadLists();
