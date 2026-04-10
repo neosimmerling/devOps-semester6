@@ -465,12 +465,10 @@ footer {
 @media (max-width: 700px) {
     .layout {
         grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;
         height: calc(100vh - 57px - 40px);
     }
 
     .sidebar {
-        height: auto;
         max-height: 35vh;
         border-right: none;
         border-bottom: 1px solid var(--border);
@@ -486,14 +484,27 @@ footer {
     .add-item-bar {
         padding: 10px 16px;
         flex-wrap: wrap;
+        gap: 6px;
     }
 
-    .add-item-bar input {
-        min-width: 0;
+    .add-item-bar input,
+    .add-item-bar select,
+    .add-item-bar button {
+        flex-shrink: 0;
+    }
+
+    .add-item-bar input[type="text"] {
+        width: 100%;
+        flex: none;
     }
 
     .items-container {
         padding: 10px 16px;
+    }
+
+    .item-row  {
+        padding: 10px 12px;
+        gap: 8px;
     }
 
     .header-logo {
@@ -506,5 +517,10 @@ footer {
 
     .item-edit-form {
         flex-wrap: wrap;
+    }
+
+    .sort-select {
+        font-size: 12px;
+        padding: 4px 6px;
     }
 }
