@@ -108,7 +108,7 @@ function renderItems(items) {
       <input type="checkbox" class="item-checkbox" ${item.is_checked ? 'checked' : ''}
         onchange="toggleItem(${item.id}, this.checked)" />
       <div class="item-main">
-        <span class="item-main">${esc(item.name)}</span>
+        <span class="item-name">${esc(item.name)}</span>
           <div class="item-tags">
               ${(item.tags || []).map(t => `<span class="tag-badge" style="background:${t.color}20;color:${t.color};border:1px solid ${t.color}40">${esc(t.name)}</span>`).join('')}
           </div>

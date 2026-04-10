@@ -28,7 +28,7 @@ def create_item(data: ItemCreate, db: Session = Depends(get_db)):
         list_id = data.list_id,
     )
     if data.tag_ids:
-        tags = db.query(Tag).filter(Tag.id.in_(data.constructtag_ids)).all()
+        tags = db.query(Tag).filter(Tag.id.in_(data.tag_ids)).all()
         item.tags = tags
     db.add(item)
     db.commit()
