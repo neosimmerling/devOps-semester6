@@ -465,11 +465,46 @@ footer {
 @media (max-width: 700px) {
     .layout {
         grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        height: calc(100vh - 57px - 40px);
     }
 
     .sidebar {
-        height: 45vh;
+        height: auto;
+        max-height: 35vh;
         border-right: none;
         border-bottom: 1px solid var(--border);
+        overflow-y: auto;
+    }
+
+    .main-header {
+        padding: 12px 16px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .add-item-bar {
+        padding: 10px 16px;
+        flex-wrap: wrap;
+    }
+
+    .add-item-bar input {
+        min-width: 0;
+    }
+
+    .items-container {
+        padding: 10px 16px;
+    }
+
+    .header-logo {
+        display: none;
+    }
+
+    .tag-select-bar {
+        width: 100%;
+    }
+
+    .item-edit-form {
+        flex-wrap: wrap;
     }
 }
