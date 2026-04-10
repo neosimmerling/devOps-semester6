@@ -1,6 +1,7 @@
 const API = '/api';
 let activeListId = null;
 let lists = [];
+let allTags = []
 
 async function apiFetch(path, opts = {}) {
   const res = await fetch( API + path, {
@@ -10,6 +11,10 @@ async function apiFetch(path, opts = {}) {
   if (res.status === 204) return null;
   if (!res.ok) throw new Error(await res.text());
   return res.json();
+}
+
+async function loadTags() {
+  allTags = await apiFetch('/tags/');
 }
 
 async function loadLists() {
@@ -81,6 +86,13 @@ function renderMain(lst) {
         <option value="Flasche">Flasche</option>
         <option value="Dose">Dose</option>
       </select>
+      <div id="tag-select-bar" class="tag-select-bar">
+        ${allTags.map(t => `
+          <label class="tag-checkbox">
+            <input type="checkbox" value="${t.id}" />
+            <span class="tag-badge" style="background:${t.color}20;color:${t.color};border:1px solid ${t.color}40">${esc(t.name)}</span>
+          </label>`).join('')}
+      </div>
       <button class="btn btn-primary" onclick="addItem()">Hinzufügen</button>
       <button class="btn btn-secondary" onclick="deleteCheckedItems()" title="Erledigte löschen">Erledigt</button>
     </div>
@@ -95,7 +107,12 @@ function renderItems(items) {
     <div class="item-row ${item.is_checked ? 'checked' : ''}" id="item-${item.id}">
       <input type="checkbox" class="item-checkbox" ${item.is_checked ? 'checked' : ''}
         onchange="toggleItem(${item.id}, this.checked)" />
-      <span class="item-name">${esc(item.name)}</span>
+      <div class="item-main">
+        <span class="item-main">${esc(item.name)}</span>
+          <div class="item-tags">
+              ${(item.tags || []).map(t => `<span class="tag-badge" style="background:${t.color}20;color:${t.color};border:1px solid ${t.color}40">${esc(t.name)}</span>`).join('')}
+          </div>
+      </div>
       <span class="item-qty">${item.quantity} ${esc(item.unit)}</span>
       ${!item.is_checked ? `<button class="btn btn-icon" onclick="startEditItem(${item.id})" title="Bearbeiten">✏️</button>` : `<span style="width:32px"></span>`}
       <button class="btn btn-danger" onclick="deleteItem(${item.id})" title="Löschen">✕</button>
@@ -122,135 +139,6 @@ async function deleteList(id) {
   await loadLists();
 }
 
-async function addItem() {
-  const name = document.getElementById('item-name').value.trim();
-  const quantity = parseInt(document.getElementById('item-qty').value) || 1;
-  const unit = document.getElementById('item-unit').value;
-  if (!name) return;
-  await apiFetch(`/items/`, {method: 'POST', body: JSON.stringify({ list_id: activeListId, name, quantity, unit }) });
-  document.getElementById('item-name').value = '';
-  await refreshActive();
-}
-
-async function toggleItem(id, checked) {
-  await apiFetch(`/items/${id}`, { method: 'PUT', body: JSON.stringify({ is_checked: checked}) });
-  await refreshActive();
-}
-
-async function deleteItem(id) {
-  await apiFetch(`/items/${id}`, { method: 'DELETE'});
-  await refreshActive();
-}
-
-function startEditItem(id) {
-  const lst = lists.find(l => l.id === activeListId);
-  const item = lst.items.find(i => i.id === id);
-  const row = document.getElementById(`item-${id}`);
-  row.innerHTML = `
-    <div class="item-edit-form">
-      <input id="edit-name-${id}" value="${esc(item.name)}" style="flex:1" />
-      <input id="edit-qty-${id}" type="number" value="${item.quantity}" style="width:60px" />
-      <select id="edit-unit-${id}" style="width:90px">
-        <option value="Stück" ${item.unit === 'Stück' ? 'selected': ''}>Stück</option>
-        <option value="kg" ${item.unit === 'kg' ? 'selected': ''}>kg</option>
-        <option value="g" ${item.unit === 'g' ? 'selected': ''}>g</option>
-        <option value="l" ${item.unit === 'l' ? 'selected': ''}>l</option>
-        <option value="ml" ${item.unit === 'ml' ? 'selected': ''}>ml</option>
-        <option value="Packung" ${item.unit === 'Packung' ? 'selected': ''}>Packung</option>
-        <option value="Flasche" ${item.unit === 'Flasche' ? 'selected': ''}>Flasche</option>
-        <option value="Dose" ${item.unit === 'Dose' ? 'selected': ''}>Dose</option>
-      </select>
-      <button class="btn btn-primary" onclick="saveEditItem(${id})">Speichern</button>
-      <button class="btn btn-icon" onclick="renderMain(lists.find(l=>l.id===activeListId))">✕</button>
-    </div>`;
-}
-
-async function saveEditItem(id) {
-  const name = document.getElementById(`edit-name-${id}`).value.trim();
-  const quantity = parseInt(document.getElementById(`edit-qty-${id}`).value) || 1;
-  const unit = document.getElementById(`edit-unit-${id}`).value.trim();
-  if (!name) return;
-  await apiFetch(`/items/${id}`, { method: 'PUT', body: JSON.stringify({name, quantity, unit}) });
-  await refreshActive();
-}
-
-async function refreshActive() {
-  await loadLists();
-  const lst = lists.find(l => l.id === activeListId);
-  if (lst) renderMain(lst);  
-}
-
-function esc(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-document.getElementById('new-list-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') createList();
-});
-
-async function deleteCheckedItems() {
-  const lst = lists.find(l => l.id === activeListId);
-  const checkedItems = lst.items.filter(i => i.is_checked);
-  if (!checkedItems.length) return;
-  if (!confirm(`${checkedItems.length} erledigte Artikel löschen?`)) return;
-  await Promise.all(checkedItems.map(i => apiFetch(`/items/${i.id}`, {method: 'DELETE' })));
-  await refreshActive();
-}
-
-function applySorting() {
-  const lst = lists.find(l => l.id === activeListId);
-  if (!lst) return;
-  const sort = document.getElementById('sort-select').value;
-  let items = [...lst.items];
-
-  if (sort === 'name') {
-    items.sort((a,b) => a.name.localeCompare(b.name));
-  } else if (sort === 'name-desc') {
-    items.sort((a,b) => b.name.localeCompare(a.name));
-  } else if (sort === 'checked') {
-    items.sort((a, b) => a.is_checked - b.is_checked);
-  } else if(sort === 'qty-asc') {
-    items.sort((a, b) => a.quantity - b.quantity);
-  } else if(sort === 'qty-desc') {
-    items.sort((a, b) => b.quantity - a.quantity);
-  } else if(sort === 'unit') {
-    items.sort((a, b) => a.unit.localeCompare(b.unit));
-  }
-
-  document.getElementById('items-container').innerHTML = renderItems(items);
-}
-
-function toggleDarkMode() {
-  document.body.classList.toggle('dark');
-  const isDark = document.body.classList.contains('dark');
-  document.getElementById('dark-toggle').textContent = isDark ? '☀️' : '🌙';
-  localStorage.setItem('darkMode', isDark);
-}
-
-if (localStorage.getItem('darkMode') === 'true') {
-  document.body.classList.add('dark');
-  document.getElementById('dark-toggle').textContent = '☀️';
-}
-
-function exportCSV() {
-  const lst = lists.find(l => l.id === activeListId);
-  if (!lst) return;
-  const rows = [['Artikel', 'Menge', 'Einheit', 'Erledigt']];
-  lst.items.forEach(i => rows.push([i.name, i.quantity, i.unit, i.is_checked ? 'Ja' : 'Nein']));
-  const csv = rows.map(r => r.join(';')).join('\n');
-  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv; charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `${lst.name}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
 function startEditList(id) {
   const lst = lists.find(l => l.id === id);
   const item = document.querySelector(`.list-item[onclick="selectList(${id})"] .list-item-name`);
@@ -272,4 +160,186 @@ async function saveEditList(id) {
   if (lst) renderMain(lst);
 }
 
-loadLists();
+async function addItem() {
+  const name = document.getElementById('item-name').value.trim();
+  const quantity = parseInt(document.getElementById('item-qty').value) || 1;
+  const unit = document.getElementById('item-unit').value;
+  if (!name) return;
+  const tag_ids = [...document.querySelectorAll('#tag-select-bar input:checked')].map(i => parseInt(i.value));
+  await apiFetch(`/items/`, {method: 'POST', body: JSON.stringify({ list_id: activeListId, name, quantity, unit, tag_ids }) });
+  document.getElementById('item-name').value = '';
+  await refreshActive();
+}
+
+async function toggleItem(id, checked) {
+  await apiFetch(`/items/${id}`, { method: 'PUT', body: JSON.stringify({ is_checked: checked}) });
+  await refreshActive();
+}
+
+async function deleteItem(id) {
+  await apiFetch(`/items/${id}`, { method: 'DELETE'});
+  await refreshActive();
+}
+
+function startEditItem(id) {
+  const lst = lists.find(l => l.id === activeListId);
+  const item = lst.items.find(i => i.id === id);
+  const row = document.getElementById(`item-${id}`);
+  const currentTagIds = (item.tags || []).map(t => t.id);
+  row.innerHTML = `
+    <div class="item-edit-form">
+      <input id="edit-name-${id}" value="${esc(item.name)}" style="flex:1" />
+      <input id="edit-qty-${id}" type="number" value="${item.quantity}" style="width:60px" />
+      <select id="edit-unit-${id}" style="width:90px">
+        <option value="Stück" ${item.unit === 'Stück' ? 'selected': ''}>Stück</option>
+        <option value="kg" ${item.unit === 'kg' ? 'selected': ''}>kg</option>
+        <option value="g" ${item.unit === 'g' ? 'selected': ''}>g</option>
+        <option value="l" ${item.unit === 'l' ? 'selected': ''}>l</option>
+        <option value="ml" ${item.unit === 'ml' ? 'selected': ''}>ml</option>
+        <option value="Packung" ${item.unit === 'Packung' ? 'selected': ''}>Packung</option>
+        <option value="Flasche" ${item.unit === 'Flasche' ? 'selected': ''}>Flasche</option>
+        <option value="Dose" ${item.unit === 'Dose' ? 'selected': ''}>Dose</option>
+      </select>
+      <div class="tag-select-bar">
+        ${allTags.map(t => `
+          <label class="tag-checkbox">
+            <input type="checkbox" value="${t.id}" ${currentTagIds.includes(t.id) ? 'checked' : ''} />
+            <span class="tag-badge" style="background:${t.color}20;color:${t.color};border:1px solid ${t.color}40">${esc(t.name)}</span>
+          </label>`).join('')}
+      </div>
+      <button class="btn btn-primary" onclick="saveEditItem(${id})">Speichern</button>
+      <button class="btn btn-icon" onclick="renderMain(lists.find(l=>l.id===activeListId))">✕</button>
+    </div>`;
+}
+
+async function saveEditItem(id) {
+  const name = document.getElementById(`edit-name-${id}`).value.trim();
+  const quantity = parseInt(document.getElementById(`edit-qty-${id}`).value) || 1;
+  const unit = document.getElementById(`edit-unit-${id}`).value.trim();
+  const tag_ids = [...document.querySelectorAll(`#item-${id} .tag-select-bar input:checked`)].map(i => parseInt(i.value))
+  if (!name) return;
+  await apiFetch(`/items/${id}`, { method: 'PUT', body: JSON.stringify({name, quantity, unit, tag_ids}) });
+  await refreshActive();
+}
+
+async function deleteCheckedItems() {
+  const lst = lists.find(l => l.id === activeListId);
+  const checkedItems = lst.items.filter(i => i.is_checked);
+  if (!checkedItems.length) return;
+  if (!confirm(`${checkedItems.length} erledigte Artikel löschen?`)) return;
+  await Promise.all(checkedItems.map(i => apiFetch(`/items/${i.id}`, {method: 'DELETE' })));
+  await refreshActive();
+}
+
+async function refreshActive() {
+  await loadLists();
+  const lst = lists.find(l => l.id === activeListId);
+  if (lst) renderMain(lst);  
+}
+
+async function createTag() {
+  const name = document.getElementById('new-tag-name').value.trim();
+  const color = document.getElementById('new-tag-color').value;
+  if (!name) return;
+  await apiFetch(`/tags/`, { method: 'POST', body: JSON.stringify({ name, color }) });
+  document.getElementById('new-tag-name').value = '';
+  await loadTags();
+  renderTagManager();
+}
+
+async function deleteTag(id) {
+  await apiFetch(`/tags/${id}`, { method: 'DELETE' });
+  await loadTags();
+  renderTagManager();
+  await refreshActive();
+}
+
+function openTagManager() {
+  document.getElementById('tag-manager-overlay').style.display = 'flex';
+  renderTagManager();
+}
+
+function closeTagManager() {
+  document.getElementById('tag-manager-overlay').style.display = 'none';
+}
+
+function renderTagManager() {
+  const list = document.getElementById(`tag-manager-list`);
+  if (!allTags.length) {
+    list.innerHTML = '<p style="color:var(--muted);font-size:13px;">Noch keine Tags vorhanden.</p>';
+    return;
+  }
+  list.innerHTML = allTags.map(t => `
+    <div class="tag-manager-row">
+      <span class="tag-badge" style="background:${t.color}20;color:${t.color};border:1px solid ${t.color}40">${esc(t.name)}</span>
+      <button class="btn btn-danger" onclick="deleteTag(${t.id})">✕</button>
+    </div>`).join('');
+}
+
+function esc(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+document.getElementById('new-list-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') createList();
+});
+
+function applySorting() {
+  const lst = lists.find(l => l.id === activeListId);
+  if (!lst) return;
+  const sort = document.getElementById('sort-select').value;
+  let items = [...lst.items];
+
+  if (sort === 'name') {
+    items.sort((a,b) => a.name.localeCompare(b.name));
+  } else if (sort === 'name-desc') {
+    items.sort((a,b) => b.name.localeCompare(a.name));
+  } else if (sort === 'checked') {
+    items.sort((a, b) => a.is_checked - b.is_checked);
+  } else if(sort === 'qty-asc') {
+    items.sort((a, b) => a.quantity - b.quantity);
+  } else if(sort === 'qty-desc') {
+    items.sort((a, b) => b.quantity - a.quantity);
+  } else if(sort === 'unit') {
+    items.sort((a, b) => a.unit.localeCompare(b.unit));
+  }
+  document.getElementById('items-container').innerHTML = renderItems(items);
+}
+
+function toggleDarkMode() {
+  document.body.classList.toggle('dark');
+  const isDark = document.body.classList.contains('dark');
+  document.getElementById('dark-toggle').textContent = isDark ? '☀️' : '🌙';
+  localStorage.setItem('darkMode', isDark);
+}
+if (localStorage.getItem('darkMode') === 'true') {
+  document.body.classList.add('dark');
+  document.getElementById('dark-toggle').textContent = '☀️';
+}
+
+function exportCSV() {
+  const lst = lists.find(l => l.id === activeListId);
+  if (!lst) return;
+  const rows = [['Artikel', 'Menge', 'Einheit', 'Tags', 'Erledigt']];
+  lst.items.forEach(i => rows.push([
+    i.name,
+    i.quantity,
+    i.unit,
+    (i.tags || []).map(t => t.name).join(', '),
+    i.is_checked ? 'Ja' : 'Nein'
+  ]));
+  const csv = rows.map(r => r.join(';')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv; charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${lst.name}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+Promise.all([loadTags(), loadLists()]);

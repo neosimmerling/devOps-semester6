@@ -390,6 +390,62 @@ footer {
     outline: none;
 }
 
+.tag-badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.tag-select-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+}
+
+.tag-checkbox {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.tag-checkbox input[type="checkbox"] {
+    display: none;
+}
+
+.tag-checkbox input:checked + .tag-badge {
+    outline: 2px solid currentColor;
+    outline-offset: 1px;
+}
+
+.item-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.item-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.tag-manager-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 0.5px solid var(--border);
+}
+
+.tag-manager-row:last-child {
+    border-bottom: none;
+}
+
 @media (max-width: 700px) {
     .layout {
         grid-template-columns: 1fr;
