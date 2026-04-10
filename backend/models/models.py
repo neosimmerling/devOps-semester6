@@ -31,10 +31,12 @@ class ShoppingItem(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
+    owner_id = Column(String, nullable=False, index=True)
     quantity = Column(Integer, default=1)
     unit = Column(String, default="Stück")
     is_checked = Column(Boolean, default=False)
     list_id = Column(Integer, ForeignKey("shopping_lists.id"), nullable=False)
 
+    items = relationship("ShoppingItem", back_populates="lists", cascade="all, delete")
     list = relationship("ShoppingList", back_populates="items")
     tags = relationship("Tag", secondary=item_tags, back_populates="items")

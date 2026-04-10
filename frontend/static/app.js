@@ -3,9 +3,21 @@ let activeListId = null;
 let lists = [];
 let allTags = []
 
+function getOwnerId() {
+  let id = localStorage.getItem('ownerId');
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem('ownerId', id);
+  }
+  return id;
+}
+
 async function apiFetch(path, opts = {}) {
   const res = await fetch( API + path, {
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Owner-Id': getOwnerId()
+    },
     ...opts
   });
   if (res.status === 204) return null;
