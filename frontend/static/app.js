@@ -186,6 +186,18 @@ async function addItem() {
 async function toggleItem(id, checked) {
   await apiFetch(`/items/${id}`, { method: 'PUT', body: JSON.stringify({ is_checked: checked}) });
   await refreshActive();
+
+  if (checked) {
+    const lst = lists.find(l => l.id === activeListId);
+    if (lst && lst.items.length > 0 && lst.items.every(i => i.is_checked)) {
+      confetti({
+        particleCount: 120,
+        spread: 80,
+        origin: { y: 0.6 },
+        colors: ['#3b6b3a', '#5dcaa5', '#e8f27e', '#ffffff']
+      });
+    }
+  }
 }
 
 async function deleteItem(id) {
