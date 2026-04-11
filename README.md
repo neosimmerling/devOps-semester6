@@ -1,5 +1,14 @@
 # DevOps Semester 6 Projekt
 
+## Live-Demo
+Die App ist live erreichbar unter: **https://einkaufsliste-t8qg.onrender.com/**
+
+> **Hinweis:** Die App läuft auf einer kostenlosen Render-Instanz und fährt nach längerer Inaktivität herunter. Der erste Aufruf kann daher **30-60 Sekunden** dauern, bis die App wieder hochgefahren ist. Danach läuft sie normal.
+
+> Bei jedem neuen Deployment wird die Datenbank zurückgesetzt. Lokal (Docker oder Python) bleiben die Daten persistent.
+
+---
+
 ## Projektbeschreibung
 Dieses Projekt ist eine einfache Fullstack-Anwendung bestehend aus:
 - **Backend:** Python (FastAPI)
@@ -10,6 +19,22 @@ Dieses Projekt ist eine einfache Fullstack-Anwendung bestehend aus:
 - **Versionierung:** Git
 
 Die Anwendung stellt eine API zur Verwaltung von Listen und Items bereit und bietet ein einfaches Frontend zur Interaktion.
+
+---
+
+## Features
+- Einkaufslisten erstellen, umbenennen, löschen
+- Artikel hinzufügen, bearbeiten, löschen
+- Mengenangabe mit Einheit (Stück, kg, ml, ...)
+- Artikel abhaken
+- erledigte Artikel auf einmal löschen
+- Tags erstellen und Artikeln zuweisen
+- Sortierung nach Name, Menge, Einheit oder Status
+- CSV-Export der Einkaufsliste
+- Dark-Mode mit Persistenz im Browser
+- Konfetti-Animation, wenn alle Artikel abgehakt sind
+- Nutzer-Isolation per Browser-ID (jeder sieht nur seine eigenen Listen)
+- responsives Design für Mobile und Desktop
 
 ---
 
