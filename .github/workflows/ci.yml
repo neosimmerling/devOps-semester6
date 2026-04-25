@@ -5,12 +5,13 @@ on:
   pull_request:
 
 jobs:
+
   test:
     name: Test & Coverage
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -23,7 +24,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run tests
-        run: pytest backend/tests/ -v --cov=backend --cov-report=term-missing
+        run: pytest backend/tests/ -v --cov=backend --cov-report=xml --cov-report=term-missing
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
@@ -49,7 +50,7 @@ jobs:
       - name: Scan dependencies
         run: pip-audit -r requirements.txt
   
-  sonarCloud:
+  sonarcloud:
     name: SonarCloud Analyse
     runs-on: ubuntu-latest
     needs: test
@@ -70,11 +71,11 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.organization=ORG_KEY
-            -Dsonar.projectKey=PROJECT_KEY
+            -Dsonar.organization=neosimmerling
+            -Dsonar.projectKey=neosimmerling_devOps-semester6
             -Dsonar.sources=backend
             -Dsonar.python.coverage.reportPaths=coverage.xml
-            -Dsonar.quality.wait=true
+            -Dsonar.qualitygate.wait=true
 
   health-check:
     name: API Health check
@@ -95,7 +96,8 @@ jobs:
       
       - name: Start API
         run: |
-          python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 & sleep 5
+          python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 &
+          sleep 5
       
       - name: Check API health
         run: |
@@ -106,7 +108,7 @@ jobs:
     name: Docker Build & push
     runs-on: ubuntu-latest
     needs: [test, dependency-scan]
-    if: github.ref == 'refs/head/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
       - uses: actions/checkout@v4
