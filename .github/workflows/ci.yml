@@ -4,6 +4,9 @@ on:
   push:
   pull_request:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
 
   test:
@@ -66,9 +69,9 @@ jobs:
           name: coverage
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+        uses: SonarSource/sonarqube-scan-action@v5
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
             -Dsonar.organization=neosimmerling
@@ -120,7 +123,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and Push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: true
